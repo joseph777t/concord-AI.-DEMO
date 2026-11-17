@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Concord MCP — Mission Control. La couche de coordination locale pour agents IA.">
+<title>Concord MCP — Mission Control</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top"><span class="logo"><span></span></span>Concord <em>Mission Control</em></a>
+    <nav class="links">
+      <a href="#demo">Démo</a>
+      <a href="#dashboard">Mission Control</a>
+      <a href="#outils">Outils</a>
+      <a href="#setup">Installation</a>
+    </nav>
+    <div class="nav-right">
+      <span class="live"><span class="dot"></span><span id="onlineCount">5 en ligne</span></span>
+      <a class="btn btn-light btn-sm" href="https://github.com/get-concord-ai/concord-mcp" target="_blank" rel="noreferrer">GitHub</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-copy">
+      <div class="pill"><span class="pill-new">Nouveau</span>Mission Control — HTML / CSS / JS, sans serveur</div>
+      <h1>Faites communiquer<br>vos agents de code.</h1>
+      <p class="lede">Concord est la couche de coordination locale pour Claude Code, Codex, Cursor et 6 autres harnesses — présence partagée, messagerie temps réel, claims anti-collision et handoffs avec preuves. Ouvrez ce fichier par double-clic : tout fonctionne hors-ligne.</p>
+      <div class="hero-cta">
+        <a class="btn btn-light" href="#dashboard">Ouvrir Mission Control →</a>
+        <button class="cmd" id="copyInstall" title="Copier la commande"><span class="cmd-icon">$</span><span>npm install -g @concord-ai/concord-mcp</span><span class="cmd-copy" id="copyInstallIcon">⧉</span></button>
+      </div>
+      <div class="hero-meta"><span class="mono">v1.x · npm</span><i></i><span>Licence MIT</span><i></i><span class="ok">● Local-first · SQLite</span></div>
+    </div>
+
+    <div class="window">
+      <div class="win-bar">
+        <div class="win-dots"><span></span><span></span><span></span></div>
+        <div class="win-tabs"><span class="on">Réseau</span><a href="#demo">Démo</a><a href="#dashboard">Tâches</a><a href="#outils">Outils</a></div>
+        <span class="win-status"><span class="dot"></span><span id="taskCountMini">4 tâches actives</span></span>
+      </div>
+      <div class="win-body">
+        <div class="mesh-col">
+          <canvas id="mesh" height="400"></canvas>
+          <div class="chips" id="agentChips"></div>
+        </div>
+        <aside class="inspector">
+          <div class="eyebrow">Inspecteur agent</div>
+          <div class="insp-head"><span class="avatar" id="inspAvatar">CC</span><div><div class="insp-name" id="inspName">Claude Code</div><div class="insp-sub" id="inspHarness">Monitor + hooks</div></div></div>
+          <p class="insp-desc" id="inspDesc"></p>
+          <dl class="insp-dl">
+            <div><dt>Livraison</dt><dd id="inspDelivery">Temps réel</dd></div>
+            <div><dt>Latence médiane</dt><dd class="mono" id="inspLatency">~300ms</dd></div>
+            <div><dt>Guide</dt><dd class="mono" id="inspDoc">docs/claude-code.md</dd></div>
+          </dl>
+          <div class="row2">
+            <a class="btn btn-light btn-block" href="#dashboard">Tester</a>
+            <a class="btn btn-block" href="#setup">Configurer</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="compat"><span>Compatible avec 9 harnesses MCP — sans orchestrateur, sans service hébergé.</span><span class="compat-list">Claude Code · Codex · Cursor · Gemini CLI · Grok Build · Goose · +3 autres</span></div>
+  </div>
+</section>
+
+<!-- ============ DEMO ============ -->
+<section class="section" id="demo">
+  <div class="wrap">
+    <div class="eyebrow"><span class="idx">01</span><span class="rule"></span>Démo interactive</div>
+    <div class="sec-head">
+      <div><h2>Deux agents, aucun humain au milieu.</h2><p class="sub">Claim concurrent, overlap détecté avant édition, négociation, contrat API, handoff. Rejouez la séquence à votre rythme.</p></div>
+      <div class="demo-ctrl">
+        <div class="seg" id="speedSeg"><button data-s="0.5">0.5×</button><button data-s="1" class="on">1×</button><button data-s="2">2×</button><button data-s="3">3×</button></div>
+        <button class="btn btn-sm" id="demoPlay">❚❚</button>
+        <button class="btn btn-sm" id="demoStep">Étape ›</button>
+        <button class="btn btn-light btn-sm" id="demoReset">↺ Rejouer</button>
+      </div>
+    </div>
+    <div class="grid-demo">
+      <div class="term">
+        <div class="term-bar"><div class="win-dots"><span></span><span></span><span></span></div><span class="mono dim">concord — claude-code ↔ codex</span><span class="mono dim" id="demoCount">1/7</span></div>
+        <div class="term-progress"><span id="demoProgress"></span></div>
+        <div class="term-body mono" id="demoLines"></div>
+        <div class="term-foot mono"><span>events.jsonl · append-only</span><button class="linklike" id="copyScript">Copier le script</button></div>
+      </div>
+      <div class="side-col">
+        <div class="card pad"><div class="eyebrow">Analyse · étape <span id="demoStepN">1/7</span></div><div class="analysis-title" id="demoTitle"></div><p class="analysis-text" id="demoExplain"></p></div>
+        <div class="stat3">
+          <div class="card mini"><div class="mono big">v1 → v4</div><div class="lbl">Versions</div></div>
+          <div class="card mini"><div class="mono big">450 ms</div><div class="lbl">Livraison</div></div>
+          <div class="card mini"><div class="mono big">exit 1</div><div class="lbl">Si overlap</div></div>
+        </div>
+        <div class="card pad small">Pourquoi pas du markdown partagé ? Ni présence, ni overlap pré-édition, ni version monotone, ni livraison live. <a href="#outils">Documentation →</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DASHBOARD ============ -->
+<section class="section" id="dashboard">
+  <div class="wrap">
+    <div class="eyebrow"><span class="idx">02</span><span class="rule"></span>Mission Control</div>
+    <div class="sec-head">
+      <div><h2>Le dashboard, en version web.</h2><p class="sub">Sept vues connectées au même modèle que Concord : présence, claims versionnés, prompts, guard et artefacts. Simulation 100 % locale.</p></div>
+      <div class="demo-ctrl"><button class="btn btn-sm" id="helpBtn"><span class="kbd">?</span> Clavier</button><button class="btn btn-sm" id="resetBtn">↺ Réinitialiser</button></div>
+    </div>
+
+    <div class="dash">
+      <div class="tabs" id="tabs">
+        <button data-tab="overview" class="on">◉ Aperçu</button>
+        <button data-tab="agents">☺ Agents</button>
+        <button data-tab="tasks">▤ Tâches</button>
+        <button data-tab="chat">✉ Messages</button>
+        <button data-tab="guard">⛨ Guard</button>
+        <button data-tab="cli">› CLI</button>
+        <button data-tab="files">▦ Fichiers</button>
+        <span class="tabs-id mono">ws_a91f</span>
+      </div>
+      <div class="dash-body">
+
+        <div class="pane on" id="pane-overview">
+          <div class="ov-grid">
+            <div class="ov-main">
+              <div class="stat4" id="ovStats"></div>
+              <div id="ovAlerts"></div>
+              <div class="card">
+                <div class="card-head"><strong>Activité</strong><span class="mono dim">events.jsonl</span><span class="badge green">append-only</span></div>
+                <div class="activity" id="ovActivity"></div>
+              </div>
+            </div>
+            <div class="ov-side">
+              <div class="card pad"><div class="card-title">Présence</div><div id="ovPresence"></div><button class="btn btn-block" data-goto="agents">Tous les agents</button></div>
+              <div class="card pad"><div class="card-title">Clavier</div><div class="keys"><span><span class="kbd">1–7</span> onglets</span><span><span class="kbd">n</span> tâche</span><span><span class="kbd">?</span> aide</span></div><p class="dim small top">Équivalent web du TUI <span class="mono">concord dashboard</span>.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pane" id="pane-agents">
+          <div class="toolbar">
+            <input class="input grow" id="agentSearch" placeholder="Filtrer les agents…">
+            <input class="input w160" id="newAgentName" placeholder="Nouvel agent…">
+            <button class="btn btn-light" id="addAgentBtn">+ Ajouter</button>
+          </div>
+          <div class="agent-grid" id="agentGrid"></div>
+          <p class="dim small">Équivalent <span class="mono">concord who</span> et <span class="mono">adapters status</span>. L'écriture ne modifie jamais le statut reporté.</p>
+        </div>
+
+        <div class="pane" id="pane-tasks">
+          <div class="toolbar"><span class="dim" id="taskCountLine"></span><button class="btn btn-light" id="openTaskModal">+ Nouvelle tâche</button></div>
+          <div class="kanban" id="kanban"></div>
+        </div>
+
+        <div class="pane" id="pane-chat">
+          <div class="chat-grid">
+            <div class="card pad">
+              <div class="eyebrow">De</div><div class="pick" id="chatFrom"></div>
+              <div class="eyebrow top">Vers</div><div class="pick" id="chatTo"></div>
+            </div>
+            <div class="chat-win">
+              <div class="card-head"><strong>Conversation</strong><span class="mono dim">update_work · prompt / reply</span></div>
+              <div class="chat-msgs" id="chatMessages"></div>
+              <div class="chat-compose">
+                <div class="replybar hidden" id="replyBar">Réponse à <span class="mono" id="replyToId"></span><button class="linklike" id="replyCancel">✕</button></div>
+                <div class="row"><input class="input grow" id="chatInput" placeholder="Message… (Entrée pour envoyer)"><button class="btn btn-light" id="chatSend">Envoyer</button></div>
+                <div class="mono dim small" id="chatKeyLine"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pane" id="pane-guard">
+          <div class="grid2">
+            <div class="card pad">
+              <div class="card-title">⛨ Vérification pre-commit</div>
+              <p class="dim small">Équivaut à <span class="mono">concord check</span> — exit 0 libre, 1 en conflit.</p>
+              <label class="lbl">Fichiers (séparés par une virgule)</label>
+              <input class="input mono" id="guardFiles" value="src/app/page.tsx">
+              <label class="lbl">Exclure ma tâche</label>
+              <select class="input" id="guardExclude"><option value="">Aucune</option></select>
+              <button class="btn btn-light btn-block top" id="guardRun">Exécuter le check</button>
+              <div class="snippet mono"> $ concord check <span id="guardEcho">src/app/page.tsx</span><br><span class="dim">$ concord check src/file.ts || exit 2</span> <button class="linklike" id="copyHook">Copier</button></div>
+            </div>
+            <div class="card pad" id="guardResult"><div class="empty">Lancez une vérification pour voir le code de sortie et les conflits.</div></div>
+          </div>
+        </div>
+
+        <div class="pane" id="pane-cli">
+          <div class="term">
+            <div class="term-bar"><span class="mono dim">concord — émulateur · ↑/↓ historique · Tab complète</span><span class="cli-quick"><button data-cmd="status">status</button><button data-cmd="who">who</button><button data-cmd="check src/app/page.tsx">check</button><button data-cmd="adapters status">adapters</button></span></div>
+            <div class="term-body mono cli-out" id="cliOut"></div>
+            <div class="cli-in"><span class="mono dim">❯</span><input class="mono" id="cliInput" placeholder="concord status…" autocomplete="off" spellcheck="false"></div>
+          </div>
+        </div>
+
+        <div class="pane" id="pane-files">
+          <div class="files-grid">
+            <div><div class="mono dim small pad-b">.concord/ — local uniquement</div><div id="fileList"></div></div>
+            <div class="term">
+              <div class="term-bar"><span class="mono" id="fileName">.concord/concord.db</span><span class="file-actions"><button class="linklike" id="fileCopy">Copier</button><button class="linklike" id="fileDl">Télécharger</button></span></div>
+              <pre class="file-pre mono" id="fileContent"></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OUTILS ============ -->
+<section class="section" id="outils">
+  <div class="wrap">
+    <div class="eyebrow"><span class="idx">03</span><span class="rule"></span>Protocole MCP</div>
+    <h2>Cinq outils, zéro changement.</h2>
+    <p class="sub">Signatures et règles reprises à l'identique — agent_id, expected_version, idempotency_key.</p>
+    <div class="grid-tools">
+      <div id="toolList"></div>
+      <div class="card pad" id="toolDetail"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPARATIF ============ -->
+<section class="section" id="comparatif">
+  <div class="wrap narrow">
+    <div class="eyebrow"><span class="idx">04</span><span class="rule"></span>Positionnement</div>
+    <h2>Sans Concord, avec Concord.</h2>
+    <p class="sub">La communication est le point de départ. Le work-state partagé rend la collaboration fiable après le message.</p>
+    <div class="cmp">
+      <div class="cmp-head"><span>Sans</span><span>Avec Concord</span></div>
+      <div class="cmp-row"><span>Agents isolés par harness, sans contact direct</span><span><strong>Prompts directs avec réponse entre clients</strong><span class="mono dim">Codex → Claude en 450 ms.</span></span></div>
+      <div class="cmp-row"><span>Collisions découvertes après l'édition</span><span><strong>Claims et overlaps avant l'édition</strong><span class="mono dim">exit 1, aucun revert.</span></span></div>
+      <div class="cmp-row"><span>Contexte perdu à la fin de la session</span><span><strong>Décisions rattachées à la tâche</strong><span class="mono dim">Retrouvable via inspect.</span></span></div>
+      <div class="cmp-row"><span>Responsabilités implicites</span><span><strong>Assignation et handoff explicites</strong><span class="mono dim">assigned jusqu'au accept.</span></span></div>
+      <div class="cmp-row"><span>Avancement reconstruit via diffs</span><span><strong>Dossiers de revue avec preuves</strong><span class="mono dim">Scope, tests, risques.</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SETUP ============ -->
+<section class="section" id="setup">
+  <div class="wrap">
+    <div class="eyebrow"><span class="idx">05</span><span class="rule"></span>Installation</div>
+    <h2>Configuration en trois étapes.</h2>
+    <p class="sub">Le wizard génère la commande exacte et la matrice de livraison par harness.</p>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="eyebrow">1 — Système</div>
+        <div class="seg3" id="osSeg"><button data-os="mac" class="on">macOS</button><button data-os="linux">Linux</button><button data-os="win">Windows</button></div>
+        <div class="eyebrow top">2 — Agents (<span id="setupCount">3</span>)</div>
+        <div class="agent-pick" id="setupAgents"></div>
+        <div class="eyebrow top">3 — Mode</div>
+        <div id="modeCards"></div>
+      </div>
+      <div class="side-col">
+        <div class="term">
+          <div class="term-bar"><span class="mono dim">Commande générée</span><button class="btn btn-light btn-sm" id="copySetup">Copier</button></div>
+          <pre class="setup-pre mono" id="setupCmd"></pre>
+          <div class="term-foot mono">Redémarrez ensuite vos clients une fois, puis <span class="mono">concord adapters status</span>.</div>
+        </div>
+        <div class="card pad"><div class="eyebrow">Fichiers écrits (fusion, jamais d'écrasement)</div><div class="tags mono"><span>.concord/</span><span>.mcp.json</span><span>.cursor/mcp.json</span><span>.gemini/settings.json</span><span>CLAUDE.md</span><span>AGENTS.md</span></div></div>
+        <div class="card pad"><div class="eyebrow">Livraison — sélection</div><div id="setupDelivery"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand"><span class="logo"><span></span></span>Concord</div>
+      <p class="dim small">Surcouche d'interface du projet open-source <a href="https://github.com/get-concord-ai/concord-mcp" target="_blank" rel="noreferrer">get-concord-ai/concord-mcp</a> (MIT). Protocole, CLI et stockage inchangés.</p>
+      <div class="tags mono"><span>npm i -g @concord-ai/concord-mcp</span><span>concord setup</span><span>concord dashboard</span></div>
+    </div>
+    <div>
+      <div class="eyebrow">Documentation</div>
+      <div class="foot-links"><a href="https://github.com/get-concord-ai/concord-mcp/blob/main/docs/claude-code.md" target="_blank" rel="noreferrer">docs/claude-code.md</a><a href="https://github.com/get-concord-ai/concord-mcp/blob/main/docs/codex.md" target="_blank" rel="noreferrer">docs/codex.md</a><a href="https://github.com/get-concord-ai/concord-mcp/blob/main/docs/cursor.md" target="_blank" rel="noreferrer">docs/cursor.md</a><a href="https://github.com/get-concord-ai/concord-mcp/blob/main/docs/gemini-cli.md" target="_blank" rel="noreferrer">docs/gemini-cli.md</a></div>
+    </div>
+    <div>
+      <div class="eyebrow">Confidentialité</div>
+      <button class="privacy" id="privacyBtn"><strong>Télémétrie : <span id="privacyState">activée</span></strong><span class="dim small" id="privacyDesc">Envois best-effort, jamais de code ni de contenu.</span><span class="linklike" id="privacyToggle">Désactiver</span></button>
+    </div>
+  </div>
+  <div class="wrap foot-base mono">MIT · Typage strict — <span>Mission Control · HTML / CSS / JS · 3 fichiers, sans serveur</span></div>
+</footer>
+
+<!-- Modale nouvelle tâche -->
+<div class="overlay hidden" id="taskModal">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Nouvelle tâche</h3><p class="dim small">Équivaut à <span class="mono">start_work</span> — claim avant édition.</p></div><button class="iconbtn" id="closeTaskModal">✕</button></div>
+    <label class="lbl">Titre</label><input class="input" id="taskTitle" placeholder="Page pricing responsive">
+    <label class="lbl">Fichiers claimés, séparés par une virgule</label><input class="input mono" id="taskFiles" placeholder="src/app/page.tsx, src/app/api/route.ts">
+    <div class="overlap-preview hidden" id="taskOverlap"></div>
+    <label class="lbl">Responsable</label><select class="input" id="taskOwner"></select>
+    <div class="row2 top"><button class="btn btn-block" id="cancelTask">Annuler</button><button class="btn btn-light btn-block" id="createTask">Créer le claim</button></div>
+  </div>
+</div>
+
+<!-- Aide clavier -->
+<div class="overlay hidden" id="helpModal">
+  <div class="modal small">
+    <h3>Raccourcis</h3>
+    <div class="help-rows"><div><span class="mono">1 – 7</span><span>Changer d'onglet</span></div><div><span class="mono">n</span><span>Nouvelle tâche</span></div><div><span class="mono">?</span><span>Cette aide</span></div><div><span class="mono">↑ / ↓</span><span>Historique CLI</span></div><div><span class="mono">Tab</span><span>Autocomplétion</span></div><div><span class="mono">Entrée</span><span>Envoyer</span></div></div>
+    <button class="btn btn-light btn-block top" id="closeHelp">Fermer</button>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<div id="boot-error" style="display:none;max-width:640px;margin:80px auto;padding:24px;border:1px solid #444;border-radius:12px;background:#111;color:#eee;font:14px/1.6 system-ui,sans-serif"></div>
+<script src="./app.js?v=2" onerror="var b=document.getElementById('boot-error');b.style.display='block';b.textContent='Le fichier app.js ne charge pas. Ouvrez bien le fichier index.html situé dans le MÊME dossier que app.js et styles.css (les 3 fichiers doivent être côte à côte).';"></script>
+<script>
+window.addEventListener('load', function () {
+  setTimeout(function () {
+    if (!window.__concordBooted) {
+      var b = document.getElementById('boot-error');
+      b.style.display = 'block';
+      b.textContent = 'La page semble bloquée (ancienne version en cache ?). Faites Ctrl+F5 pour forcer le rechargement, ou rouvrez le bon fichier index.html avec Live Server.';
+    }
+  }, 2500);
+});
+</script>
+</body>
+</html>
